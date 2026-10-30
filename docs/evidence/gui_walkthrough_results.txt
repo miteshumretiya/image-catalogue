@@ -1,0 +1,28 @@
+GUI walkthrough run on 2026-10-30 21:10
+
+MT01  PASS           30 images with thumbnails. Status 'Scan complete. 30 image(s) added. 1 file(s) could not be read.'
+MT02  PASS           Warning 'Some files were skipped' listed broken.jpg; the other 30 were still added
+MT03  PASS           notes.txt is not in the table and not reported as a failure
+MT04  PASS           200-image scan took 1.8s; a 20 ms timer on the GUI thread fired 53 times, longest gap 78 ms (window never froze)
+MT05  PASS           Progress went (0, 201) -> (201, 201) in 202 updates; bar hidden afterwards: True
+MT06  PASS           Pressed Cancel: 'Scan cancelled. 66 image(s) were added before stopping. 1 file(s) could not be read.'. Add Folder enabled again: True
+MT07  PASS           Scanned the same folder again: 'Scan complete. 134 image(s) added. 1 file(s) could not be read.'; 200 images in total (was 66), 0 duplicates
+MT08  PASS           Status 'Scan complete. 0 image(s) added.', 0 images, no dialogs
+MT09  PASS           Second scan of the same folder: status 'Scan complete. 0 image(s) added. 1 file(s) could not be read.', still 30 images
+MT10  PASS           Ascending 10.0 .. 94.9 KB, descending 94.9 .. 10.0 KB (numeric order)
+MT11  PASS           Preview and details of photo_001.jpg shown; preview rescaled 327px -> 522px wide when the window was enlarged
+MT12  PASS           Saved: title 'Beach day', tags ['sea', 'holiday'], rating 4; form now shows tags 'sea, holiday'
+MT13  PASS           Error 'Title cannot be empty.'; image unchanged
+MT14  PASS           Error ''hello world' is not a valid tag. Use letters, numbers or hyphens (max 20 characters).'; image unchanged
+MT15  PASS           Typed 120 characters, the box kept 100
+MT16  PASS           Set 9 -> 5; set -3 -> 0; step down from 0 -> 0
+MT17  PASS           Typed 'holiday': 1 row shown (the image tagged in MT12)
+MT18  PASS           Typed 'zzzz': 0 rows; after clearing: 30 rows
+MT19  PASS           Answered Yes: 29 images left; photo_002.png still on disk: True
+MT20  PASS           Answered No: still 30 images
+MT21  PASS           Saved test.json, opened it in a new window: 29 images; edited image has tags ['sea', 'holiday'], rating 4
+MT22  PASS           Error 'Could not open catalogue': This file is not a valid catalogue (bad JSON):; still 29 images
+MT23  PASS           Save/Discard/Cancel asked: True; Cancel kept the window open: True; Discard closed it: True
+MT24  PASS           done.wav loaded: True; sound played 1 time(s) with the option on, 0 time(s) with it off. Listen for it by hand too
+MT25  PASS           Asked 'Scan in progress'; window closed: True; background thread stopped: True
+MT26  CHECK BY HAND  Shortcuts set: {'open_folder_action': 'Ctrl+O', 'save_action': 'Ctrl+S', 'remove_action': 'Del', 'cancel_action': 'Esc'}. Pressing them needs a focused real window
