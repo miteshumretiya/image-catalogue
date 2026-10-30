@@ -1,0 +1,14 @@
+$ git merge feature/window-title
+Auto-merging catalogue/views/main_window.py
+CONFLICT (content): Merge conflict in catalogue/views/main_window.py
+Automatic merge failed; fix conflicts and then commit the result.
+
+Conflicted section of catalogue/views/main_window.py:
+<<<<<<< HEAD
+        self.setWindowTitle("My Image Catalogue")
+=======
+        self.setWindowTitle("Image Catalogue - Photo Organiser")
+>>>>>>> feature/window-title
+
+Resolved to:
+        self.setWindowTitle("Image Catalogue - Photo Organiser")
