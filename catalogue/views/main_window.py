@@ -5,14 +5,15 @@ anything. When the user does something, the window emits a signal and the
 controller decides what should happen.
 """
 from PyQt6.QtCore import Qt, QSize, pyqtSignal
-from PyQt6.QtGui import QAction, QKeySequence, QPixmap
+from PyQt6.QtGui import QAction, QColor, QKeySequence, QPainter, QPixmap
 from PyQt6.QtWidgets import (
-    QMainWindow, QWidget, QSplitter, QVBoxLayout, QHBoxLayout, QFormLayout,
+    QMainWindow, QWidget, QSplitter, QVBoxLayout, QFormLayout, QStyle,
     QTableView, QLineEdit, QLabel, QSpinBox, QPushButton, QGroupBox,
     QProgressBar, QFileDialog, QMessageBox, QAbstractItemView, QHeaderView,
 )
 
 from catalogue.model.image_item import MAX_RATING, MIN_RATING, MAX_TITLE_LENGTH
+from catalogue.views.theme import MUTED
 
 
 class PreviewLabel(QLabel):
@@ -22,7 +23,7 @@ class PreviewLabel(QLabel):
         super().__init__("Select an image to preview it")
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setMinimumSize(250, 200)
-        self.setStyleSheet("background: #2b2b2b; color: #bbbbbb; border-radius: 4px;")
+        self.setStyleSheet(f"background: #eef0f3; color: {MUTED}; border-radius: 6px;")
         self._pixmap = None
 
     def set_image(self, path):
@@ -49,6 +50,23 @@ class PreviewLabel(QLabel):
                 Qt.AspectRatioMode.KeepAspectRatio,
                 Qt.TransformationMode.SmoothTransformation,
             ))
+
+
+class ImageTable(QTableView):
+    """A QTableView that shows a hint instead of a blank area when it's empty."""
+
+    def paintEvent(self, event):
+        super().paintEvent(event)
+        proxy = self.model()
+        if proxy is None or proxy.rowCount() > 0:
+            return
+        if proxy.sourceModel().rowCount() == 0:
+            hint = "No images yet.\nClick Add Folder to start."
+        else:
+            hint = "No images match your search."
+        painter = QPainter(self.viewport())
+        painter.setPen(QColor(MUTED))
+        painter.drawText(self.viewport().rect(), Qt.AlignmentFlag.AlignCenter, hint)
 
 
 class MainWindow(QMainWindow):
@@ -80,26 +98,39 @@ class MainWindow(QMainWindow):
 
     # ---- building the window ----
 
+    def _icon(self, name):
+        """One of Qt's built-in icons, e.g. _icon("SP_DirOpenIcon")."""
+        return self.style().standardIcon(getattr(QStyle.StandardPixmap, name))
+
     def _create_actions(self):
-        self.open_folder_action = QAction("&Add Folder...", self)
+        # setIconText gives each action a shorter label for its toolbar button
+        self.open_folder_action = QAction(self._icon("SP_FileDialogNewFolder"), "&Add Folder...", self)
+        self.open_folder_action.setIconText("Add Folder")
         self.open_folder_action.setShortcut(QKeySequence("Ctrl+O"))
         self.open_folder_action.setStatusTip("Scan a folder and add its images")
         self.open_folder_action.triggered.connect(self.open_folder_requested)
 
-        self.open_catalogue_action = QAction("Open &Catalogue...", self)
+        self.open_catalogue_action = QAction(self._icon("SP_DialogOpenButton"), "Open &Catalogue...", self)
+        self.open_catalogue_action.setIconText("Open")
         self.open_catalogue_action.setShortcut(QKeySequence("Ctrl+L"))
+        self.open_catalogue_action.setStatusTip("Open a saved catalogue file")
         self.open_catalogue_action.triggered.connect(self.open_catalogue_requested)
 
-        self.save_action = QAction("&Save Catalogue", self)
+        self.save_action = QAction(self._icon("SP_DialogSaveButton"), "&Save Catalogue", self)
+        self.save_action.setIconText("Save")
         self.save_action.setShortcut(QKeySequence.StandardKey.Save)
+        self.save_action.setStatusTip("Save the catalogue to a file")
         self.save_action.triggered.connect(self.save_catalogue_requested)
 
-        self.remove_action = QAction("&Remove Image", self)
+        self.remove_action = QAction(self._icon("SP_TrashIcon"), "&Remove Image", self)
+        self.remove_action.setIconText("Remove")
         self.remove_action.setShortcut(QKeySequence.StandardKey.Delete)
+        self.remove_action.setStatusTip("Remove the selected image from the catalogue")
         self.remove_action.triggered.connect(self.remove_requested)
 
-        self.cancel_action = QAction("&Cancel Scan", self)
+        self.cancel_action = QAction(self._icon("SP_BrowserStop"), "&Cancel Scan", self)
         self.cancel_action.setShortcut(QKeySequence("Esc"))
+        self.cancel_action.setStatusTip("Stop the scan that is running")
         self.cancel_action.triggered.connect(self.cancel_requested)
 
         self.sound_action = QAction("Play &Sound When Done", self)
@@ -110,7 +141,7 @@ class MainWindow(QMainWindow):
         self.exit_action = QAction("E&xit", self)
         self.exit_action.triggered.connect(self.close)
 
-        self.about_action = QAction("&About", self)
+        self.about_action = QAction(self._icon("SP_MessageBoxInformation"), "&About", self)
         self.about_action.triggered.connect(self._show_about)
 
     def _create_menus(self):
@@ -134,11 +165,19 @@ class MainWindow(QMainWindow):
     def _create_toolbar(self):
         toolbar = self.addToolBar("Main")
         toolbar.setMovable(False)
+        toolbar.setIconSize(QSize(18, 18))
+        toolbar.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
         toolbar.addAction(self.open_folder_action)
+        toolbar.addAction(self.open_catalogue_action)
         toolbar.addAction(self.save_action)
+        toolbar.addSeparator()
         toolbar.addAction(self.remove_action)
         toolbar.addSeparator()
         toolbar.addAction(self.cancel_action)
+
+        # Red text for the buttons that remove or stop something (see theme.py)
+        for action in (self.remove_action, self.cancel_action):
+            toolbar.widgetForAction(action).setObjectName("dangerButton")
 
     def _create_central_area(self):
         # Left side: search box + table
@@ -147,7 +186,7 @@ class MainWindow(QMainWindow):
         self.search_box.setClearButtonEnabled(True)
         self.search_box.textChanged.connect(self.search_changed)
 
-        self.table = QTableView()
+        self.table = ImageTable()
         self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
@@ -160,6 +199,7 @@ class MainWindow(QMainWindow):
         left = QWidget()
         left_layout = QVBoxLayout(left)
         left_layout.setContentsMargins(0, 0, 0, 0)
+        left_layout.setSpacing(8)
         left_layout.addWidget(self.search_box)
         left_layout.addWidget(self.table)
 
@@ -172,6 +212,7 @@ class MainWindow(QMainWindow):
         self.path_label = QLabel()
         self.path_label.setWordWrap(True)
         self.path_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        self.path_label.setStyleSheet(f"color: {MUTED};")
         self.info_label = QLabel()
         self.title_edit = QLineEdit()
         self.title_edit.setMaxLength(MAX_TITLE_LENGTH)
@@ -181,6 +222,8 @@ class MainWindow(QMainWindow):
         self.rating_spin.setRange(MIN_RATING, MAX_RATING)
         self.rating_spin.setSuffix(" / 5")
         self.save_details_button = QPushButton("Save Details")
+        self.save_details_button.setObjectName("primaryButton")    # blue, see theme.py
+        self.save_details_button.setCursor(Qt.CursorShape.PointingHandCursor)
         self.save_details_button.clicked.connect(self._on_save_details_clicked)
         self.title_edit.returnPressed.connect(self._on_save_details_clicked)
 
@@ -200,17 +243,20 @@ class MainWindow(QMainWindow):
         right_layout.addWidget(details_box, stretch=2)
 
         splitter = QSplitter(Qt.Orientation.Horizontal)
+        splitter.setContentsMargins(10, 10, 10, 8)
         splitter.addWidget(left)
         splitter.addWidget(right)
-        splitter.setSizes([700, 450])
+        splitter.setSizes([730, 420])
         self.setCentralWidget(splitter)
 
     def _create_status_bar(self):
         self.progress_bar = QProgressBar()
         self.progress_bar.setMaximumWidth(250)
-        self.cancel_button = QPushButton("Cancel")
+        self.cancel_button = QPushButton(self._icon("SP_BrowserStop"), "Cancel")
+        self.cancel_button.setObjectName("dangerButton")
         self.cancel_button.clicked.connect(self.cancel_requested)
         self.count_label = QLabel()
+        self.count_label.setObjectName("countLabel")
 
         bar = self.statusBar()
         bar.addPermanentWidget(self.count_label)
@@ -223,7 +269,7 @@ class MainWindow(QMainWindow):
         self._proxy = proxy
         self.table.setModel(proxy)
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
-        for column, width in enumerate([80, 150, 130, 100, 65, 75, 80]):
+        for column, width in enumerate([80, 125, 110, 90, 60, 70, 90]):
             self.table.setColumnWidth(column, width)
         self.table.horizontalHeader().setStretchLastSection(True)
         self.table.sortByColumn(1, Qt.SortOrder.AscendingOrder)   # sort by name
