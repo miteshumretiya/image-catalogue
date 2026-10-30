@@ -55,7 +55,7 @@
 
 Dialogs: folder chooser, open/save file dialogs, error and warning message boxes, "remove this image?" confirmation, and "save changes?" on exit.
 
-**The finished window** follows this wireframe: menu bar and toolbar at the top, the search box above a sortable table with thumbnails on the left, and the preview and details form on the right. The progress bar and Cancel button sit in the status bar and only appear while a scan is running.
+**The finished window** follows this wireframe: menu bar and toolbar at the top, the search box above a sortable table with thumbnails on the left, and the preview and details form on the right. The progress bar and Cancel button sit in the status bar and only appear while a scan is running. After the first working version I polished the look on a separate branch: the toolbar buttons got icons, borders and colours (blue for the main action, red for removing or stopping), an Open button was added to the toolbar, and the app uses a light theme.
 
 ![The finished main window](evidence/MT01_after_scan.png)
 
