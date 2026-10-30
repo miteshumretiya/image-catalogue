@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Testing
+.pytest_cache/
+
+# PyInstaller output (rebuild with: pyinstaller image_catalogue.spec)
+build/
+dist/
+
+# Generated test data and personal files
+sample_images/
+*.json
+!docs/*.json
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
