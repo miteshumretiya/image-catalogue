@@ -4,13 +4,13 @@
 - The controller reacts: asks the model to do things, starts background
   work, and tells the window what to show.
 """
-from PyQt6.QtCore import QUrl
+from PyQt6.QtCore import QThread, QUrl
 from PyQt6.QtMultimedia import QSoundEffect
 
 from catalogue.model.catalogue import CatalogueError
 from catalogue.model.image_item import ValidationError
 from catalogue.views.image_table_model import ImageTableModel, ImageFilterProxy
-from catalogue.model.processing import find_images, process_image
+from catalogue.workers.scan_worker import ScanWorker
 
 
 class MainController:
@@ -66,26 +66,26 @@ class MainController:
             self.start_scan(folder)
 
     def start_scan(self, folder):
-        # First version: no background thread yet. The window freezes
-        # until every image has been processed.
+        self.thread = QThread()
+        self.worker = ScanWorker(folder, self.thumb_dir)
+        self.worker.moveToThread(self.thread)
+
+        # Because the worker lives in another thread, Qt automatically uses
+        # queued connections here: each signal is delivered to our slots on
+        # the GUI thread, so it's safe to update widgets in them.
+        self.thread.started.connect(self.worker.run)
+        self.worker.progress.connect(self.window.update_progress)
+        self.worker.item_ready.connect(self.on_item_ready)
+        self.worker.scan_finished.connect(self.on_scan_finished)
+        self.worker.scan_failed.connect(self.on_scan_failed)
+
+        self.worker.scan_finished.connect(self.thread.quit)
+        self.worker.scan_failed.connect(self.thread.quit)
+        self.thread.finished.connect(self._on_thread_finished)
+
+        self.window.set_busy(True)
         self.window.show_status(f"Scanning {folder} ...")
-        try:
-            paths = find_images(folder)
-        except OSError as e:
-            self.on_scan_failed(str(e))
-            return
-        added = 0
-        failures = []
-        for path in paths:
-            try:
-                item = process_image(path, self.thumb_dir)
-            except OSError as e:
-                failures.append((path, str(e)))
-                continue
-            if self.table_model.add_item(item):
-                added += 1
-        self._update_count()
-        self.on_scan_finished(added, failures, False)
+        self.thread.start()
 
     def cancel_scan(self):
         if self.worker is not None:
