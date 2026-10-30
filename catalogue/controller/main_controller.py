@@ -20,6 +20,7 @@ class MainController:
         self.thumb_dir = thumb_dir
         self.catalogue_path = None   # where we last saved/loaded
         self.current_row = -1
+        self.added_count = 0         # images really added by the current scan
 
         self.thread = None
         self.worker = None
@@ -66,6 +67,7 @@ class MainController:
             self.start_scan(folder)
 
     def start_scan(self, folder):
+        self.added_count = 0
         self.thread = QThread()
         self.worker = ScanWorker(folder, self.thumb_dir)
         self.worker.moveToThread(self.thread)
@@ -94,9 +96,13 @@ class MainController:
 
     def on_item_ready(self, item):
         if self.table_model.add_item(item):
+            self.added_count += 1
             self._update_count()
 
-    def on_scan_finished(self, added, failures, cancelled):
+    def on_scan_finished(self, _images_read, failures, cancelled):
+        # The worker counts every image it read, including ones already in
+        # the catalogue, so use our own count of what was really added.
+        added = self.added_count
         self.window.set_busy(False)
         if cancelled:
             message = f"Scan cancelled. {added} image(s) were added before stopping."
