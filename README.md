@@ -106,8 +106,10 @@ tests/                       automated tests (pytest)
 benchmark/benchmark.py       performance and parallelism investigation
 tools/                       sample image maker, sound maker, race-condition demo
 assets/done.wav              completion sound
-docs/                        design, test plan, performance, git, report
-  Image_Catalogue_Technical_Report.docx   the full report in Word (with appendices)
+docs/
+  Image_Catalogue_Technical_Report.docx   the report; design spec, test plan and
+                                          performance investigation are appendices
+  evidence/                  screenshots, test results, merge-conflict output
 image_catalogue.spec         PyInstaller build configuration
 ```
 
