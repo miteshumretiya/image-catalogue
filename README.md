@@ -77,6 +77,14 @@ python tools/gui_walkthrough.py
 
 This opens the real window, works through the manual test plan, and saves screenshots and results to `docs/evidence/`.
 
+## Troubleshooting (macOS)
+
+If `python main.py` stops with `Could not find the Qt platform plugin "cocoa"`, macOS has marked the files inside the `.venv` folder as hidden, and Qt skips hidden plugin files. Remove the flag and run it again:
+
+```bash
+chflags -R nohidden .venv
+```
+
 ## Project structure
 
 ```
