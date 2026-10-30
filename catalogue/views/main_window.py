@@ -65,7 +65,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Image Catalogue")
+        self.setWindowTitle("My Image Catalogue")
         self.resize(1150, 700)
         self.close_check = None   # the controller sets this to decide if we can close
         self._proxy = None
