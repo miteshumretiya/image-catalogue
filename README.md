@@ -64,7 +64,26 @@ python benchmark/benchmark.py 40
 pyinstaller image_catalogue.spec
 ```
 
-The app is created in `dist/ImageCatalogue/`. Copy that whole folder to another computer and run `ImageCatalogue.exe` (Windows) or `ImageCatalogue` (Linux/macOS). Python does not need to be installed on that computer. Build on the same operating system you want to run it on, because PyInstaller does not cross-compile.
+- **macOS:** the app is created as `dist/ImageCatalogue.app`. Double-click it in Finder (or run `open dist/ImageCatalogue.app`). You can copy it to the Applications folder.
+- **Windows:** the app is created in `dist/ImageCatalogue/`. Copy that whole folder and run `ImageCatalogue.exe`.
+
+Python does not need to be installed on the computer that runs the built app. Build on the same operating system you want to run it on, because PyInstaller does not cross-compile. Tested on macOS 26.6 (Intel) with Python 3.14.7.
+
+## Run the manual test walkthrough
+
+```bash
+python tools/gui_walkthrough.py
+```
+
+This opens the real window, works through the manual test plan, and saves screenshots and results to `docs/evidence/`.
+
+## Troubleshooting (macOS)
+
+If `python main.py` stops with `Could not find the Qt platform plugin "cocoa"`, macOS has marked the files inside the `.venv` folder as hidden, and Qt skips hidden plugin files. Remove the flag and run it again:
+
+```bash
+chflags -R nohidden .venv
+```
 
 ## Project structure
 

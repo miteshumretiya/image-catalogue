@@ -52,7 +52,7 @@ class ScanWorker(QObject):
     # Custom signals. These are how the worker talks to the GUI.
     progress = pyqtSignal(int, int)             # done, total
     item_ready = pyqtSignal(object)             # an ImageItem
-    scan_finished = pyqtSignal(int, list, bool)  # added, failures, was_cancelled
+    scan_finished = pyqtSignal(int, list, bool)  # images read, failures, was_cancelled
     scan_failed = pyqtSignal(str)               # a problem that stopped the whole scan
 
     def __init__(self, folder, thumb_dir, max_threads=4):
