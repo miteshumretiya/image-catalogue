@@ -107,6 +107,7 @@ benchmark/benchmark.py       performance and parallelism investigation
 tools/                       sample image maker, sound maker, race-condition demo
 assets/done.wav              completion sound
 docs/                        design, test plan, performance, git, report
+  Image_Catalogue_Technical_Report.docx   the full report in Word (with appendices)
 image_catalogue.spec         PyInstaller build configuration
 ```
 
