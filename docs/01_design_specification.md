@@ -55,7 +55,9 @@
 
 Dialogs: folder chooser, open/save file dialogs, error and warning message boxes, "remove this image?" confirmation, and "save changes?" on exit.
 
-<!-- Add a screenshot of the finished app here and compare it with the wireframe -->
+**The finished window** follows this wireframe: menu bar and toolbar at the top, the search box above a sortable table with thumbnails on the left, and the preview and details form on the right. The progress bar and Cancel button sit in the status bar and only appear while a scan is running.
+
+![The finished main window](evidence/MT01_after_scan.png)
 
 ## 1.4 Architecture
 

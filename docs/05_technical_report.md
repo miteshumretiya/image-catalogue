@@ -89,12 +89,18 @@ The project was built up in stages, with a commit at each step:
 2. **main**: the first GUI, with the scan running on the GUI thread (it froze the window).
 3. **`feature/threaded-processing`** branch: added `ScanWorker` with the thread pool and the locked counter, then switched the controller to a background `QThread` with progress and cancel. Merged back into main with `--no-ff`, so the branch is visible in the history.
 4. **`feature/window-title`** branch: a **controlled merge conflict**. Both main and the branch changed the same `setWindowTitle(...)` line. `git merge` stopped with `CONFLICT (content): Merge conflict in catalogue/views/main_window.py` and added `<<<<<<< HEAD`, `=======` and `>>>>>>>` markers. `HEAD` is main's version and the part after `=======` is the branch's. I resolved it by keeping the branch's title ("Image Catalogue - Photo Organiser"), deleted the markers, ran the tests (68 passed) and committed the merge. The full output is in `evidence/git_merge_conflict.txt`.
-5. **`feature/testing`** branch: the benchmark, the GUI walkthrough script, the D5 bug fix as its own `Fix:` commit, and the test and performance documents. Merged into main.
-6. **main**: PyInstaller configuration (with the macOS `.app` bundle) and final documentation.
+5. **`feature/testing`** branch: the benchmark, the GUI walkthrough script, the D5 bug fix as its own `Fix:` commit, the PyInstaller configuration (with the macOS `.app` bundle), and the test, performance and report documents.
+6. **Pull request and merge:** `feature/testing` was merged into main on GitHub through pull request #1, then the GitHub screenshots were added on main.
 
-**Remote:** the repository was pushed to a private GitHub repository (`image-catalogue`). A pull request was used to review and merge the `feature/testing` work.
+**Remote:** all four branches were pushed to a private GitHub repository (`miteshumretiya/image-catalogue`) with `git push -u origin ...`. Pull request #1, "Add testing, benchmark, packaging and documentation", contained 10 commits and 25 changed files, with a description of what it adds and how it was tested. After checking the "Files changed" tab I merged it on GitHub, then ran `git pull` to bring the merge commit back to my Mac. I kept the feature branches on GitHub instead of deleting them, so the history stays visible.
 
-`git log --oneline --graph --all` shows the branches splitting off and merging back in.
+![Pull request #1 on GitHub](evidence/github_pull_request.png)
+
+![Pull request #1 merged](evidence/github_merged.png)
+
+`git log --oneline --graph --all` shows the three branches splitting off and merging back in, including the conflict merge and the pull request merge:
+
+![Git history graph](evidence/git_log_graph.png)
 
 ## 15.7 Evaluation
 
