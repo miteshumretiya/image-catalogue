@@ -28,11 +28,13 @@ from PyQt6.QtWidgets import QApplication, QMessageBox  # noqa: E402
 from catalogue.controller.main_controller import MainController  # noqa: E402
 from catalogue.model.catalogue import ImageCatalogue  # noqa: E402
 from catalogue.views.main_window import MainWindow  # noqa: E402
+from catalogue.views.theme import apply_light_theme  # noqa: E402
 
 EVIDENCE = os.path.join(ROOT, "docs", "evidence")
 SOUND = os.path.join(ROOT, "assets", "done.wav")
 
 app = QApplication(sys.argv)
+apply_light_theme(app)   # same look as main.py
 work = tempfile.mkdtemp(prefix="imgcat_gui_")
 results = []
 
@@ -128,6 +130,7 @@ def main():
     w, c = s.window, s.controller
 
     # ---- scanning ----
+    s.shot("MT08_empty_catalogue")
     s.scan(empty)
     record("MT08", f"Status '{s.status()}', {s.count()} images, no dialogs",
            s.count() == 0 and "0 image(s) added" in s.status() and not s.dialogs)

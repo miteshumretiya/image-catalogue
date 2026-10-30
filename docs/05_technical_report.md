@@ -17,7 +17,8 @@ The project uses MVC, adapted to Qt's model/view framework (see the diagram in `
 | Model | `model/image_item.py`: `ImageItem`, validation functions | One image's data; rules for valid title, tags, rating |
 | Model | `model/catalogue.py`: `ImageCatalogue` | The collection: add, remove, edit, search, save/load JSON |
 | Model | `model/processing.py` | Find image files; read details and make thumbnails |
-| View | `views/main_window.py`: `MainWindow`, `PreviewLabel` | Widgets, menus, toolbar, dialogs; emits custom signals |
+| View | `views/main_window.py`: `MainWindow`, `PreviewLabel`, `ImageTable` | Widgets, menus, toolbar, dialogs; emits custom signals |
+| View | `views/theme.py` | The light theme: Fusion style, a fixed light palette and one style sheet for buttons, inputs, table and status bar |
 | View (Qt adapter) | `views/image_table_model.py`: `ImageTableModel`, `ImageFilterProxy` | Connects the catalogue to `QTableView`; sorting and filtering |
 | Controller | `controller/main_controller.py`: `MainController` | Reacts to view signals, updates the model, runs the worker |
 | Worker | `workers/scan_worker.py`: `ScanWorker`, `ScanStats` | Background scanning and thread-safe progress counting |
@@ -32,6 +33,10 @@ The project uses MVC, adapted to Qt's model/view framework (see the diagram in `
 ## 15.3 GUI design decisions
 
 - **QMainWindow** gives the standard menu bar, toolbar and status bar layout that users already know.
+- **Light theme with clear buttons (`views/theme.py`).** In the first version the toolbar actions showed as plain text, which didn't look like buttons. I switched to Qt's Fusion style with a fixed light palette, so the app looks the same on macOS and Windows and stays light even when the Mac is in dark mode. Every toolbar button now has an icon and text, a border and a hover highlight. The icons are Qt's built-in standard icons, so there are no extra image files to package.
+- **Colour means something.** Blue is only used for the main action in the form (Save Details). Red is only used for actions that remove or stop something (Remove, Cancel Scan). Disabled buttons turn grey, so it's clear what you can do at any moment. For example, Remove stays grey until an image is selected.
+- **Gold stars** (★★★★☆) make ratings easy to read at a glance. The empty table shows "No images yet. Click Add Folder to start." instead of a blank area, or "No images match your search." when a search finds nothing.
+- **All the styling is in one file.** The window code only gives widgets names like `primaryButton` or `dangerButton`, and `theme.py` decides what those look like. The look can change without touching the window's logic.
 - **QTableView rather than a QListWidget of thumbnails:** the user wants to compare details (size, rating, tags) and sort by them, and a table does that well. The thumbnail is in the first column so it's still visual.
 - **QSplitter** between the table and the preview so the user can choose how much space each gets.
 - **QFormLayout** for the details, since label/field pairs are what forms are for.
@@ -91,6 +96,7 @@ The project was built up in stages, with a commit at each step:
 4. **`feature/window-title`** branch: a **controlled merge conflict**. Both main and the branch changed the same `setWindowTitle(...)` line. `git merge` stopped with `CONFLICT (content): Merge conflict in catalogue/views/main_window.py` and added `<<<<<<< HEAD`, `=======` and `>>>>>>>` markers. `HEAD` is main's version and the part after `=======` is the branch's. I resolved it by keeping the branch's title ("Image Catalogue - Photo Organiser"), deleted the markers, ran the tests (68 passed) and committed the merge. The full output is in `evidence/git_merge_conflict.txt`.
 5. **`feature/testing`** branch: the benchmark, the GUI walkthrough script, the D5 bug fix as its own `Fix:` commit, the PyInstaller configuration (with the macOS `.app` bundle), and the test, performance and report documents.
 6. **Pull request and merge:** `feature/testing` was merged into main on GitHub through pull request #1, then the GitHub screenshots were added on main.
+7. **`feature/ui-polish`** branch: the visual polish (light theme, button icons and colours, gold stars, empty-table message), with the tests and the GUI walkthrough re-run so the screenshots show the new look. Merged into main through pull request #2.
 
 **Remote:** all four branches were pushed to a private GitHub repository (`miteshumretiya/image-catalogue`) with `git push -u origin ...`. Pull request #1, "Add testing, benchmark, packaging and documentation", contained 10 commits and 25 changed files, with a description of what it adds and how it was tested. After checking the "Files changed" tab I merged it on GitHub, then ran `git pull` to bring the merge commit back to my Mac. I kept the feature branches on GitHub instead of deleting them, so the history stays visible.
 

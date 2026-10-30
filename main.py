@@ -11,6 +11,7 @@ from PyQt6.QtWidgets import QApplication
 from catalogue.controller.main_controller import MainController
 from catalogue.model.catalogue import ImageCatalogue
 from catalogue.views.main_window import MainWindow
+from catalogue.views.theme import apply_light_theme
 
 
 def resource_path(relative):
@@ -25,6 +26,7 @@ def resource_path(relative):
 def main():
     app = QApplication(sys.argv)
     app.setApplicationName("Image Catalogue")
+    apply_light_theme(app)
 
     thumb_dir = Path.home() / ".image_catalogue" / "thumbnails"
     thumb_dir.mkdir(parents=True, exist_ok=True)

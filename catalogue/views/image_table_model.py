@@ -5,9 +5,11 @@ ImageCatalogue and tells the QTableView whenever rows are added, removed
 or changed. All its methods must be called from the GUI thread.
 """
 from PyQt6.QtCore import Qt, QAbstractTableModel, QModelIndex, QSortFilterProxyModel
-from PyQt6.QtGui import QIcon
+from PyQt6.QtGui import QColor, QIcon
 
 from catalogue.model.catalogue import ImageCatalogue
+from catalogue.model.image_item import MAX_RATING
+from catalogue.views.theme import STAR
 
 COLUMNS = ["Preview", "Name", "Title", "Dimensions", "Format", "Size (KB)", "Rating", "Tags"]
 SORT_ROLE = Qt.ItemDataRole.UserRole
@@ -44,10 +46,13 @@ class ImageTableModel(QAbstractTableModel):
                 item.dimensions,
                 item.image_format,
                 f"{item.size_kb:.1f}",
-                "★" * item.rating,
+                "★" * item.rating + "☆" * (MAX_RATING - item.rating),
                 ", ".join(item.tags),
             ]
             return values[column]
+
+        if role == Qt.ItemDataRole.ForegroundRole and column == 6:
+            return QColor(STAR)   # gold stars
 
         if role == SORT_ROLE:
             # Raw values so numbers sort as numbers, not as text

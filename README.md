@@ -97,6 +97,7 @@ catalogue/
   views/                     what the user sees
     main_window.py           QMainWindow, menus, toolbar, preview, form
     image_table_model.py     Qt table model + search/sort proxy
+    theme.py                 light theme: colours and button styles
   controller/
     main_controller.py       connects the window, the data and the worker
   workers/

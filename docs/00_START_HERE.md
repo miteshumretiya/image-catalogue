@@ -46,6 +46,8 @@ Then run `python -m pytest tests/test_image_item.py -v` and read the tests next 
 - `_create_status_bar()` adds the progress bar and Cancel button.
 - At the top are the **custom signals**. The methods at the bottom (`show_details`, `set_busy`, `show_error`, ...) are what the controller calls.
 
+`views/theme.py` holds the light theme. Widgets get special colours through their object name. For example, the Save Details button is named `primaryButton`, and theme.py makes anything with that name blue.
+
 `views/image_table_model.py` is how Qt's `QTableView` gets its data. `rowCount`, `columnCount` and `data` are called by Qt whenever it repaints. `beginInsertRows`/`endInsertRows` tell the view "a row was added". The proxy handles searching and sorting.
 
 ## Step 5: Threads (the most important part for marks)
